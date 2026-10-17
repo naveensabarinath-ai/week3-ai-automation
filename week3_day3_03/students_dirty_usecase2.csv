@@ -1,0 +1,51 @@
+Student_ID,Name,Email,Phone,Course,Fee_Paid,City,Enrolled_Date,Email_Valid
+STU1001,Manoj K,invalid_email,9876543210abc,Python,False,Chennai,2025-05-10,False
+STU1002,Priya Sharma,manoj.k_at_gmail.com,98765,Data Science,True,Bangalore,2025-05-11,False
+STU1003,Rahul Verma,priya.sharma@@yahoo,9876543210987,AI & ML,True,Hyderabad,2025-05-12,False
+STU1004,Ananya Iyer,rahul.verma#domain.com,987-654-CALL,Web Dev,False,Mumbai,2025-05-13,False
+STU1005,Karthik Raja,,+91-98765-XXXXX,Cloud Computing,True,Delhi,2025-05-14,False
+STU1006,Sneha Patel,sneha patel@gmail.com,12345,Python,True,Pune,2025-05-15,False
+STU1007,Venkatesh S,venkatesh..s@org,98765 4321,Data Science,False,Coimbatore,2025-05-16,False
+STU1008,Divya Nair,divya@nair,PHONE_NOT_GIVEN,AI & ML,True,Chennai,2025-05-17,False
+STU1009,Arun Kumar,arun.kumar@,0000000000,Web Dev,True,Bangalore,2025-05-18,False
+STU1010,Pooja Hegde,pooja.hegde@.com,98765432101112,Cloud Computing,False,Hyderabad,2025-05-19,False
+STU1011,Rohan Gupta,rohan@gupta@biz,998877,Python,True,Mumbai,2025-05-20,False
+STU1012,Deepa Sundaram,deepa_sundaram_gmail.com,98765#4321,Data Science,True,Delhi,2025-05-21,False
+STU1013,Suresh Babu,suresh!babu@web,abcd987654,AI & ML,False,Pune,2025-05-22,False
+STU1014,Kavya Reddy,kavya.reddy@mail..com,98765432,Web Dev,True,Coimbatore,2025-05-23,False
+STU1015,Vikram Rathore,vikram.rathore@com,99999-HELP,Cloud Computing,True,Chennai,2025-05-24,False
+STU1016,Meera Joshi,meera joshi@work.net,+91 9876,Python,False,Bangalore,2025-05-25,False
+STU1017,Aravind Swamy,aravind@@swamy.org,987654321000,Data Science,True,Hyderabad,2025-05-26,False
+STU1018,Swati Deshmukh,swati#deshmukh@site,N/A,AI & ML,True,Mumbai,2025-05-27,False
+STU1019,Naveen Prasad,naveen.prasad,98401XXXXX,Web Dev,False,Delhi,2025-05-28,False
+STU1020,Harini R,harini.r@invalid_domain,912345,Cloud Computing,True,Pune,2025-05-29,False
+STU1021,Gautam Menon,gautam.menon@filmmaker,987654321-EXT,Python,True,Coimbatore,2025-05-10,False
+STU1022,Ritu Sen,ritu.sen_at_kolkata.in,88888,Data Science,False,Chennai,2025-05-11,False
+STU1023,Pradeep Chandran,,97900abcde,AI & ML,True,Bangalore,2025-05-12,False
+STU1024,Lavanya Devi,lavanya..devi@web.co,98410984109999,Web Dev,True,Hyderabad,2025-05-13,False
+STU1025,Siddharth Rao,siddharth.rao@domain@net,NOT_AVAILABLE,Cloud Computing,False,Mumbai,2025-05-14,False
+STU1026,Anusha Pillai,anusha.pillai@@edu,98765 43210 99,Python,True,Delhi,2025-05-15,False
+STU1027,Madhavan T,madhavan_t#actor.org,99400,Data Science,True,Pune,2025-05-16,False
+STU1028,Shalini Bose,shalini@bose@corp,98840-00-??,AI & ML,False,Coimbatore,2025-05-17,False
+STU1029,Kishore Kumar,kishore.kumar@music.,044-245678,Web Dev,True,Chennai,2025-05-18,False
+STU1030,Bhavana Menon,bhavana@menon_org,987654321O,Cloud Computing,True,Bangalore,2025-05-19,False
+STU1031,Ajith Kumar,ajith..kumar@cinema.tn,9876543,Python,False,Hyderabad,2025-05-20,False
+STU1032,Keerthi Suresh,keerthi_suresh_at_inbox.com,996200000000,Data Science,True,Mumbai,2025-05-21,False
+STU1033,Surya Narayanan,surya.narayanan@,CALL_ME_987,AI & ML,True,Delhi,2025-05-22,False
+STU1034,Trisha Krishnan,trisha#krishnan@web.com,94440#####,Web Dev,False,Pune,2025-05-23,False
+STU1035,Vijay Sethupathi,vijay.sethupathi@@kollywood.in,9840001,Cloud Computing,True,Coimbatore,2025-05-24,False
+STU1036,Nayanthara K,nayanthara_lady_superstar,98765-INVALID,Python,True,Chennai,2025-05-25,False
+STU1037,Dhanush R,dhanush.r#raanjhanaa.com,80560,Data Science,False,Bangalore,2025-05-26,False
+STU1038,Samantha Ruth,samantha..ruth@prabhu,987654321099,AI & ML,True,Hyderabad,2025-05-27,False
+STU1039,Silambarasan T,silambarasan.t@str.,UNKNOWN,Web Dev,True,Mumbai,2025-05-28,False
+STU1040,Aishwarya Rai,aishwarya.rai@world@miss,984119841198411,Cloud Computing,False,Delhi,2025-05-29,False
+STU1041,Mohanlal V,mohanlal.v@lalettan,98841-ERROR,Python,True,Pune,2025-05-10,False
+STU1042,Mammootty K,mammootty.k_at_kerala.gov,979100,Data Science,True,Coimbatore,2025-05-11,False
+STU1043,Fahadh Faasil,fahadh..faasil@actor,9876543210_EXTN,AI & ML,False,Chennai,2025-05-12,False
+STU1044,Sai Pallavi,,112233,Web Dev,True,Bangalore,2025-05-13,False
+STU1045,Dulquer Salmaan,dulquer..salmaan@dq.cars,99401-TEST,Cloud Computing,True,Hyderabad,2025-05-14,False
+STU1046,Nivin Pauly,nivin#pauly@prem.am,987654321,Python,False,Mumbai,2025-05-15,False
+STU1047,Tovino Thomas,tovino.thomas@@minnal.net,984009840098400,Data Science,True,Delhi,2025-05-16,False
+STU1048,Rashmika Mandanna,rashmika.mandanna@geetha.,NONE,AI & ML,True,Pune,2025-05-17,False
+STU1049,Allu Arjun,allu.arjun#pushpa@fire,979010,Web Dev,False,Coimbatore,2025-05-18,False
+STU1050,Ram Charan,ram.charan@rrr,98842-FALSE,Cloud Computing,True,Chennai,2025-05-19,False

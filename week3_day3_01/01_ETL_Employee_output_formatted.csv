@@ -1,0 +1,31 @@
+﻿name,first_name,last_name,email,department,role,office,salary,start_date,years_of_experience,region
+Marcus Chen,Marcus,Chen,marcus.chen@example.com,Engineering,Senior Software Engineer,San Francisco,155000,2019-03-15,7.6,NAM
+Priya Sharma,Priya,Sharma,priya.sharma@example.com,Engineering,Staff Engineer,San Francisco,178000,2019-06-01,7.4,NAM
+David Kim,David,Kim,david.kim@example.com,Engineering,Software Engineer,New York,125000,2021-01-10,5.8,NAM
+Rachel Torres,Rachel,Torres,rachel.torres@example.com,Engineering,Engineering Manager,San Francisco,168000,2020-02-20,6.7,NAM
+James Okafor,James,Okafor,james.okafor@example.com,Engineering,Junior Developer,Austin,92000,2024-06-15,2.3,NAM
+Lena Vogt,Lena,Vogt,lena.vogt@example.com,Engineering,DevOps Engineer,New York,140000,2022-04-01,4.5,NAM
+Amir Patel,Amir,Patel,amir.patel@example.com,Engineering,Backend Engineer,London,132000,2023-01-09,3.8,EMEA
+Sofia Lindberg,Sofia,Lindberg,sofia.lindberg@example.com,Design,Lead Designer,New York,145000,2019-09-12,7.1,NAM
+Carlos Rivera,Carlos,Rivera,carlos.rivera@example.com,Design,UX Designer,San Francisco,112000,2021-07-20,5.3,NAM
+Hannah Becker,Hannah,Becker,hannah.becker@example.com,Design,UI Designer,London,105000,2022-11-01,3.9,EMEA
+Yuki Tanaka,Yuki,Tanaka,yuki.tanaka@example.com,Design,Product Designer,San Francisco,118000,2023-03-14,3.6,NAM
+Olivia Martin,Olivia,Martin,olivia.martin@example.com,Marketing,VP of Marketing,New York,165000,2019-04-22,7.5,NAM
+Ethan Brooks,Ethan,Brooks,ethan.brooks@example.com,Marketing,Content Strategist,Austin,95000,2021-10-05,5,NAM
+Nina Kowalski,Nina,Kowalski,nina.kowalski@example.com,Marketing,SEO Specialist,New York,88000,2022-08-15,4.2,NAM
+Daniel Ochoa,Daniel,Ochoa,daniel.ochoa@example.com,Marketing,Marketing Analyst,Austin,91000,2023-05-20,3.4,NAM
+Samira Hassan,Samira,Hassan,samira.hassan@example.com,Marketing,Social Media Manager,London,82000,2024-01-08,2.8,EMEA
+Tyler Washington,Tyler,Washington,tyler.washington@example.com,Sales,Sales Director,New York,158000,2019-11-30,6.9,NAM
+Jessica Huang,Jessica,Huang,jessica.huang@example.com,Sales,Account Executive,San Francisco,110000,2020-06-14,6.3,NAM
+Ryan O'Brien,Ryan,O'Brien,ryan.obrien@example.com,Sales,Account Executive,London,105000,2021-03-22,5.6,EMEA
+Fatima Al-Rashid,Fatima,Al-Rashid,fatima.alrashid@example.com,Sales,Sales Development Rep,Austin,72000,2023-09-01,3.1,NAM
+Kevin Dupont,Kevin,Dupont,kevin.dupont@example.com,Sales,Solutions Engineer,San Francisco,135000,2022-01-17,4.8,NAM
+Megan Stewart,Megan,Stewart,megan.stewart@example.com,Sales,Account Manager,New York,98000,2024-03-11,2.6,NAM
+Laura Chen,Laura,Chen,laura.chen@example.com,HR,HR Director,New York,148000,2019-08-05,7.2,NAM
+Brian Nakamura,Brian,Nakamura,brian.nakamura@example.com,HR,HR Business Partner,San Francisco,105000,2020-12-01,5.9,NAM
+Chloe Dubois,Chloe,Dubois,chloe.dubois@example.com,HR,Recruiter,London,78000,2022-05-23,4.4,EMEA
+Angela Moretti,Angela,Moretti,angela.moretti@example.com,HR,People Operations,Austin,85000,2023-07-10,3.3,NAM
+Isaac Fernandez,Isaac,Fernandez,isaac.fernandez@example.com,Engineering,Frontend Engineer,New York,128000,2022-09-19,4.1,NAM
+Sarah Mitchell,Sarah,Mitchell,sarah.mitchell@example.com,Design,Design Systems Lead,San Francisco,138000,2020-04-06,6.5,NAM
+Omar Farah,Omar,Farah,omar.farah@example.com,Engineering,QA Engineer,London,95000,2024-02-12,2.7,EMEA
+Natalie Park,Natalie,Park,natalie.park@example.com,Marketing,Growth Manager,San Francisco,108000,2021-11-28,4.9,NAM

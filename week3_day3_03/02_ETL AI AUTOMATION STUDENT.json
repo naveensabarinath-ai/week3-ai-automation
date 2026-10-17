@@ -1,0 +1,296 @@
+{
+  "name": "02_ETL AI AUTOMATION STUDENT",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "File Upload ",
+        "formDescription": "This page to load the Employee information",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload Student File",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -448,
+        -48
+      ],
+      "id": "4e73f34a-88dc-4175-a143-b7eb26446f55",
+      "name": "On form submission",
+      "webhookId": "e5e44347-c63f-45eb-99b0-836cdf5bdeed"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "Upload_Student_File",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        -48
+      ],
+      "id": "8fcd44ce-ad91-40b6-89ef-1632fdb81ddd",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a deterministic data transformation and validation assistant. Your job is to transform the provided student record into a clean, normalized, and validated JSON object.\n\nCURRENT_DATE: 2026-10-17\n\nApply the following cleaning, transformation, and validation rules:\n1. \"Email\" & \"Email_Valid\":\n   - Clean whitespace and convert to lowercase.\n   - Fix obvious typos if salvageable (e.g., replace \"_at_\" or \"@@\" with \"@\").\n   - If the resulting string matches standard email syntax (local@domain.ext), keep the cleaned string and set \"Email_Valid\" to true.\n   - If invalid (e.g., \"invalid_email\", missing domain, broken structure) or empty, set \"Email\" to null and set \"Email_Valid\" to false.\n\n2. \"Phone\" & \"Phone_Valid\":\n   - Extract only digits from the input string (strip letters, dashes, spaces, symbols).\n   - If the cleaned digits form a valid 10-digit mobile number, format it as a clean 10-digit string (e.g., \"9876543210\") and set \"Phone_Valid\" to true.\n   - If the digit count is invalid (fewer than 10 or greater than 10, dummy numbers like all zeroes, or unresolvable letters), set \"Phone\" to null and set \"Phone_Valid\" to false.\n\n3. \"Fee_Paid\":\n   - Convert string values (\"True\", \"False\", \"true\", \"false\") into native JSON booleans (true or false).\n\n4. \"Enrolled_Date\":\n   - Standardize to strict ISO format (YYYY-MM-DD).\n\n5. \"days_since_enrolled\":\n   - Calculate the integer number of elapsed days between \"Enrolled_Date\" and CURRENT_DATE (2026-10-17).\n\n6. Preserve all other fields (\"Student_ID\", \"Name\", \"Course\", \"City\") exactly as provided.\n\nOUTPUT INSTRUCTIONS:\n- Return ONLY a single valid JSON object representing the cleaned student record.\n- Do NOT wrap your output in markdown code fences (no ``` or ```json).\n- Do NOT include any introductory greetings, explanations, notes, or trailing text.\n\nInput Student Record:\n{{ JSON.stringify($json) }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        240,
+        112
+      ],
+      "id": "14825240-adb7-4198-a74c-5eb781ed4028",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        160
+      ],
+      "id": "6c1a297f-8697-4a90-af1a-7fac12660465",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OFFaF38lCDUSTj41",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop through every item received from the upstream AI node\nreturn $input.all().map(item => {\n  let record = item.json;\n\n  // 1. Handle potential nested AI response wrappers (e.g., if output is under 'text', 'response', or 'output')\n  if (typeof record.text === 'string') {\n    try {\n      record = JSON.parse(record.text);\n    } catch (e) {\n      // If it has markdown code block fences (```json ... ```)\n      const cleanedText = record.text.replace(/```json/g, '').replace(/```/g, '').trim();\n      record = JSON.parse(cleanedText);\n    }\n  } else if (typeof record.output === 'string') {\n    try {\n      record = JSON.parse(record.output);\n    } catch (e) {\n      const cleanedText = record.output.replace(/```json/g, '').replace(/```/g, '').trim();\n      record = JSON.parse(cleanedText);\n    }\n  }\n\n  // 2. Normalize and trim string fields\n  const studentId = record.Student_ID ? String(record.Student_ID).trim() : null;\n  const name = record.Name ? String(record.Name).trim() : null;\n  const course = record.Course ? String(record.Course).trim() : null;\n  const city = record.City ? String(record.City).trim() : null;\n  const enrolledDate = record.Enrolled_Date ? String(record.Enrolled_Date).trim() : null;\n\n  // 3. Post-validate and sanitize Email\n  let email = record.Email ? String(record.Email).trim().toLowerCase() : null;\n  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  let emailValid = Boolean(record.Email_Valid);\n\n  if (!email || !emailRegex.test(email)) {\n    email = null;\n    emailValid = false;\n  } else {\n    emailValid = true;\n  }\n\n  // 4. Post-validate and sanitize Phone (strictly 10 digits)\n  let rawPhone = record.Phone ? String(record.Phone).replace(/\\D/g, '') : '';\n  let phone = null;\n  let phoneValid = false;\n\n  // Handle standard 10-digit format or 12-digit format with country code '91'\n  if (rawPhone.length === 12 && rawPhone.startsWith('91')) {\n    rawPhone = rawPhone.slice(2);\n  }\n\n  if (rawPhone.length === 10 && !/^0{10}$/.test(rawPhone)) {\n    phone = rawPhone;\n    phoneValid = true;\n  }\n\n  // 5. Enforce strict Boolean for Fee_Paid\n  let feePaid = false;\n  if (typeof record.Fee_Paid === 'boolean') {\n    feePaid = record.Fee_Paid;\n  } else if (typeof record.Fee_Paid === 'string') {\n    feePaid = record.Fee_Paid.toLowerCase() === 'true';\n  }\n\n  // 6. Recalculate or enforce integer for days_since_enrolled\n  let daysSinceEnrolled = Number.isInteger(record.days_since_enrolled)\n    ? record.days_since_enrolled\n    : parseInt(record.days_since_enrolled, 10);\n\n  if (isNaN(daysSinceEnrolled) && enrolledDate) {\n    const enrollDateObj = new Date(enrolledDate);\n    const targetDate = new Date('2026-10-17');\n    const diffTime = targetDate - enrollDateObj;\n    daysSinceEnrolled = Math.floor(diffTime / (1000 * 60 * 60 * 24));\n  }\n\n  // 7. Overall record status tag (useful for filtering/branching downstream)\n  const status = (emailValid && phoneValid) ? 'VALID' : 'REQUIRES_REVIEW';\n\n  return {\n    json: {\n      Student_ID: studentId,\n      Name: name,\n      Email: email,\n      Email_Valid: emailValid,\n      Phone: phone,\n      Phone_Valid: phoneValid,\n      Course: course,\n      Fee_Paid: feePaid,\n      City: city,\n      Enrolled_Date: enrolledDate,\n      days_since_enrolled: daysSinceEnrolled,\n      record_status: status\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        112
+      ],
+      "id": "2cbfad04-f5ae-4499-9c86-20a66f7f16ed",
+      "name": "Code in JavaScript",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "de2dcc8a-2864-445c-a3c9-230064915dad",
+              "leftValue": "={{ $json.City.toLowerCase().trim() }}",
+              "rightValue": "chennai",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "6ebb4f64-8d91-44ba-bc61-5e50027fc616",
+              "leftValue": "={{ $json.Email_Valid }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        -64
+      ],
+      "id": "f92f175c-f366-45c3-93dd-5faa84649fa4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        -224
+      ],
+      "id": "5551d223-8a09-4e74-834b-f8712f5b11d3",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "options": {
+          "fileName": "fee_unpaid_students"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        -48
+      ],
+      "id": "0ce3f3c8-36f0-423c-b275-5736458b4f97",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "297d61a4-d5e7-49ef-bd8e-44ea787d1356",
+      "name": "Loop Over Items"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "590ac9fe-c942-4e3c-9424-ca1b22e17655",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "597c905018e403e1580d376b74b543c78dd4564cc10eca1cc0b79970908696eb"
+  },
+  "nodeGroups": [],
+  "id": "Cs8IxBx9YK0obM81",
+  "tags": []
+}

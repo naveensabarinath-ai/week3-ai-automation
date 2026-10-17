@@ -1,0 +1,185 @@
+{
+  "name": "ETL AI AUTOMATION",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Data Upload",
+        "formDescription": "This page to load the Employee information",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Attach File",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -448,
+        -48
+      ],
+      "id": "69a62e7b-e0dd-44c2-9b16-37116c3bd02a",
+      "name": "On form submission",
+      "webhookId": "51b25550-dc2e-49ad-87c5-be5b7e99cbe6"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "Attach_File",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        -48
+      ],
+      "id": "a719e9f0-6059-4733-9ef8-b7bbde6c27de",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a deterministic data transformation assistant. Your job is to transform the provided single employee record into a clean, enriched JSON object.\n\nCURRENT_DATE: 2026-10-17\n\nApply the following transformation and enrichment rules:\n1. \"first_name\": Extract the first name from the \"name\" field.\n2. \"last_name\": Extract the remaining surname/last name from the \"name\" field.\n3. \"years_of_experience\": Calculate the tenure in years between \"start_date\" (YYYY-MM-DD) and CURRENT_DATE (2026-10-17). Round the value to 1 decimal place (e.g., 4.5).\n4. \"region\": Map based on \"office\" location:\n   - \"NAM\" for North American offices (e.g., San Francisco, New York, Austin, Toronto, Vancouver, Seattle).\n   - \"EMEA\" for European, Middle Eastern, and African offices (e.g., London, Berlin, Paris, Dublin, Amsterdam).\n   - \"APAC\" for Asia-Pacific offices (e.g., Bangalore, Bengaluru, Singapore, Tokyo, Sydney).\n   - \"Other\" if the location does not match any known region.\n5. \"salary\": Convert string/formatted values to a clean integer/number without currency symbols or commas.\n6. \"start_date\": Ensure standard ISO format (YYYY-MM-DD).\n7. Preserve all other original fields as they are.\n\nOUTPUT INSTRUCTIONS:\n- Return ONLY a valid, single JSON object { ... }.\n- Do NOT wrap your output in markdown backticks (no ``` or ```json).\n- Do NOT include greetings, preamble, explanations, or trailing commentary.\n\nInput Employee Record:\n{{ JSON.stringify($json) }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "1000859d-cc39-4991-b10c-2cad8242502d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        160
+      ],
+      "id": "034d15a8-5668-4b06-8bd9-be5d2d6f2e2f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OFFaF38lCDUSTj41",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst cleanedRecords = [];\n\n// Helper to safely parse raw or escaped AI string responses\nfunction parseAiOutput(raw) {\n  if (!raw) return null;\n  if (typeof raw === 'object') return raw;\n\n  if (typeof raw === 'string') {\n    // 1. Strip markdown fences, backticks, and whitespace\n    let cleaned = raw\n      .replace(/```(?:json)?/gi, '')\n      .replace(/```/g, '')\n      .replace(/\\u00a0/g, ' ')\n      .trim();\n\n    // 2. Unescape wrapping outer quotes if double-stringified\n    if (cleaned.startsWith('\"') && cleaned.endsWith('\"')) {\n      try {\n        cleaned = JSON.parse(cleaned);\n      } catch (e) {\n        // Continue if single parse fails\n      }\n    }\n\n    // 3. Extract JSON object boundaries { ... } or array [ ... ]\n    const firstBrace = cleaned.search(/[\\{\\[]/);\n    const lastBrace = Math.max(cleaned.lastIndexOf('}'), cleaned.lastIndexOf(']'));\n\n    if (firstBrace !== -1 && lastBrace !== -1) {\n      cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n    }\n\n    try {\n      return JSON.parse(cleaned);\n    } catch (err) {\n      // Fallback for unescaped control chars / stray line returns\n      const sanitized = cleaned.replace(/[\\n\\r\\t]/g, ' ');\n      return JSON.parse(sanitized);\n    }\n  }\n\n  return null;\n}\n\nfor (const item of items) {\n  // Extract output from common AI node keys: text, output, message.content, or root\n  const rawTarget = item.json?.text ?? item.json?.output ?? item.json?.message?.content ?? item.json;\n  \n  let parsed;\n  try {\n    parsed = parseAiOutput(rawTarget);\n  } catch (err) {\n    continue; // Skip malformed non-JSON items\n  }\n\n  if (!parsed) continue;\n\n  // Normalize single object vs array of objects\n  const records = Array.isArray(parsed) ? parsed : [parsed];\n\n  for (const rec of records) {\n    if (!rec || typeof rec !== 'object') continue;\n\n    cleanedRecords.push({\n      json: {\n        name: rec.name?.trim() ?? '',\n        first_name: rec.first_name?.trim() ?? '',\n        last_name: rec.last_name?.trim() ?? '',\n        email: rec.email?.trim()?.toLowerCase() ?? '',\n        department: rec.department?.trim() ?? '',\n        role: rec.role?.trim() ?? '',\n        office: rec.office?.trim() ?? '',\n        salary: Number(rec.salary) || 0,\n        start_date: rec.start_date ?? '',\n        years_of_experience: Number(rec.years_of_experience) || 0,\n        region: rec.region?.trim() ?? '',\n        // Include any remaining custom fields dynamically\n        ...rec\n      }\n    });\n  }\n}\n\nreturn cleanedRecords;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -48
+      ],
+      "id": "034b2c28-9a8c-4db5-976e-640ea1403ddc",
+      "name": "Code in JavaScript",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        -48
+      ],
+      "id": "14a46a4f-c693-4891-aa53-8f1eb17bd71b",
+      "name": "Convert to File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7bee2bd0-ce85-49aa-be3a-b90cbf7b4027",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "597c905018e403e1580d376b74b543c78dd4564cc10eca1cc0b79970908696eb"
+  },
+  "nodeGroups": [],
+  "id": "gR1dt36lmBVHYN3Z",
+  "tags": []
+}

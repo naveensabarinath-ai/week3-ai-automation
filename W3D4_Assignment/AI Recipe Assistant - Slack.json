@@ -1,0 +1,196 @@
+{
+  "name": "AI Recipe Assistant - Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "watchWorkspace": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b8231257-ee52-4abe-ac23-e0747a332abb",
+      "name": "Slack Trigger",
+      "webhookId": "20b8cd67-7366-4780-afab-a2f00af24cb5",
+      "credentials": {
+        "slackApi": {
+          "id": "oXXAx1BYY0VLxf4k",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab9cb99c-7c4e-4e84-96b2-cdf4f4136562",
+              "name": "=recipe",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "d85f3bd8-a48d-460b-8749-5315b90e9469",
+              "name": "channelId",
+              "value": "={{ $json.channel }}",
+              "type": "string"
+            },
+            {
+              "id": "1aff1200-5ff5-4a98-a34e-ba6fccf92ef4",
+              "name": "userId",
+              "value": "={{ $json.user }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "35339de2-fb1d-42f1-9c35-eb258cc43491",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a helpful cooking assistant.\n\nA user wants to make this recipe:\n{{ $json.recipe }}\n\nList all the ingredients needed to prepare the recipe.\n\nRequirements:\n1. Include approximate quantities for 2 servings.\n2. Use a clear bulleted list.\n3. Group ingredients where helpful.\n4. Keep the answer practical and concise.\n5. If the recipe name is empty or unclear, ask the user to provide a valid recipe name.\n6. Return plain text suitable for a Slack message.\n\nDo not include unrelated information.",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        0
+      ],
+      "id": "1929a9ad-1d18-40f8-9859-8d91bbefaa2d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "8eb13826-a4ec-4cb7-a927-d7100487d759",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OFFaF38lCDUSTj41",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=D0CA76RK28Z",
+          "mode": "id"
+        },
+        "text": "={{ $json.text }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        816,
+        0
+      ],
+      "id": "fa68daa6-1654-4954-a46f-49a616cbf3f3",
+      "name": "Send a message",
+      "webhookId": "230603a8-7a6b-4d7f-98d6-7a4e9aeb073f",
+      "credentials": {
+        "slackApi": {
+          "id": "oXXAx1BYY0VLxf4k",
+          "name": "Slack account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6e913a1b-160b-4b73-9d40-9d1d48aadd3a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "597c905018e403e1580d376b74b543c78dd4564cc10eca1cc0b79970908696eb"
+  },
+  "nodeGroups": [],
+  "id": "zMPaY04C5YrYtk4N",
+  "tags": []
+}
